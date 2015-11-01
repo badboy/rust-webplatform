@@ -414,6 +414,7 @@ impl<'a> Document<'a> {
 }
 
 pub struct LocalStorageInterface;
+pub struct SessionStorageInterface;
 
 pub struct LocalStorageIterator {
     index: i32,
@@ -510,6 +511,60 @@ impl LocalStorageInterface {
     }
 }
 
+impl SessionStorageInterface {
+    pub fn len(&self) -> i32 {
+        js! { br#"
+            return window.sessionStorage.length;
+        "#}
+    }
+
+    pub fn clear(&self) {
+        js! { br#"
+            window.sessionStorage.clear();
+        "#};
+    }
+
+    pub fn remove(&self, s: &str) {
+        js! { (s) br#"
+            window.sessionStorage.removeItem(UTF8ToString($0));
+        "#};
+    }
+
+    pub fn set(&self, s: &str, v: &str) {
+        js! { (s, v) br#"
+            window.sessionStorage.setItem(UTF8ToString($0), UTF8ToString($1));
+        "#};
+    }
+
+    pub fn get(&self, name: &str) -> Option<String> {
+        let a = js! { (name) br#"
+            var str = window.sessionStorage.getItem(UTF8ToString($0));
+            if (str == null) {
+                return -1;
+            }
+            return allocate(intArrayFromString(str), 'i8', ALLOC_STACK);
+        "# };
+        if a == -1 {
+            None
+        } else {
+            Some(unsafe {
+                str::from_utf8(CStr::from_ptr(a as *const libc::c_char).to_bytes()).unwrap().to_owned()
+            })
+        }
+    }
+
+    pub fn key(&self, index: i32) -> String {
+        let a = js! { (index) br#"
+            var key = window.sessionStorage.key($0);
+            return allocate(intArrayFromString(str), 'i8', ALLOC_STACK);
+        "# };
+        unsafe {
+            str::from_utf8(CStr::from_ptr(a as *const libc::c_char).to_bytes()).unwrap().to_owned()
+        }
+    }
+}
+
+
 impl IntoIterator for LocalStorageInterface {
     type Item = String;
     type IntoIter = LocalStorageIterator;
@@ -532,6 +587,8 @@ impl Iterator for LocalStorageIterator {
 
 #[allow(non_upper_case_globals)]
 pub const LocalStorage: LocalStorageInterface = LocalStorageInterface;
+#[allow(non_upper_case_globals)]
+pub const SessionStorage: SessionStorageInterface = SessionStorageInterface;
 
 pub fn init<'a>() -> Document<'a> {
     js! { br#"

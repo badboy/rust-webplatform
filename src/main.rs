@@ -32,6 +32,15 @@ fn main() {
             println!("ajax executed!, data: {:?}", data);
         });
 
+        webplatform::SessionStorageInterface.set("start", "0");
+
+        js! {
+            br#"
+                var start = sessionStorage.getItem('start');
+                console.log({start: start});
+            "#
+        };
+
         println!("This should be blue: {:?}", bodyref.prop_get_str("bgColor"));
         println!("Width?: {:?}", bodyref.prop_get_i32("clientWidth"));
 
