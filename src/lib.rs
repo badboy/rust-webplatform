@@ -426,8 +426,8 @@ pub struct JQuery<'a> {
 extern fn rust_caller_string<F: FnMut(String)>(a: *const libc::c_void, dataptr: *const libc::c_char) {
     let v:&mut F = unsafe { mem::transmute(a) };
     let data = unsafe {
-            str::from_utf8_unchecked(CStr::from_ptr(dataptr).to_bytes()).unwrap().to_owned()
-    }
+        str::from_utf8_unchecked(CStr::from_ptr(dataptr).to_bytes()).unwrap().to_owned()
+    };
     v(data.into());
 }
 impl<'a> JQuery<'a> {
