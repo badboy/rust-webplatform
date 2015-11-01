@@ -428,7 +428,7 @@ extern fn rust_caller_string<F: FnMut(String)>(a: *const libc::c_void, dataptr: 
     let data = unsafe {
         str::from_utf8_unchecked(CStr::from_ptr(dataptr).to_bytes()).to_owned()
     };
-    v(data.into());
+    v(data);
 }
 impl<'a> JQuery<'a> {
     pub fn new<'a>() -> JQuery<'a> {
