@@ -420,7 +420,7 @@ pub struct LocalStorageIterator {
 }
 
 pub struct JQuery<'a> {
-    refs: Rc<RefCell<Vec<Box<FnMut(Event<'a>) + 'a>>>>,
+    refs: Rc<RefCell<Vec<Box<FnMut(String) + 'a>>>>,
 }
 
 extern fn rust_caller_string<F: FnMut(String)>(a: *const libc::c_void, dataptr: *const libc::c_char) {
@@ -432,7 +432,7 @@ extern fn rust_caller_string<F: FnMut(String)>(a: *const libc::c_void, dataptr: 
 }
 impl<'a> JQuery<'a> {
     pub fn new<'a>() -> JQuery<'a> {
-        Document {
+        JQuery {
             refs: Rc::new(RefCell::new(Vec::new())),
         }
     }
