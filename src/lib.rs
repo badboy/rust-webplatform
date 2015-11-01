@@ -126,6 +126,10 @@ pub struct Event<'a> {
     pub target: Option<HtmlNode<'a>>
 }
 
+pub struct JsonObject {
+    pub data: String
+}
+
 extern fn rust_caller<F: FnMut(Event)>(a: *const libc::c_void, docptr: *const libc::c_void, id: i32) {
     let v:&mut F = unsafe { mem::transmute(a) };
     v(Event {
@@ -413,6 +417,44 @@ pub struct LocalStorageInterface;
 
 pub struct LocalStorageIterator {
     index: i32,
+}
+
+pub struct JQuery<'a> {
+    refs: Rc<RefCell<Vec<Box<FnMut(Event<'a>) + 'a>>>>,
+}
+
+extern fn rust_caller_string<F: FnMut(String)>(a: *const libc::c_void, dataptr: *const libc::c_char) {
+    let v:&mut F = unsafe { mem::transmute(a) };
+    let data = unsafe {
+            str::from_utf8_unchecked(CStr::from_ptr(dataptr).to_bytes()).unwrap().to_owned()
+    }
+    v(data.into());
+}
+impl<'a> JQuery<'a> {
+    pub fn new<'a>() -> JQuery<'a> {
+        Document {
+            refs: Rc::new(RefCell::new(Vec::new())),
+        }
+    }
+
+    pub fn ajax<F: FnMut(String) + 'a>(&self, url: String, f: F) {
+        unsafe {
+            let b = Box::new(f);
+            let a = &*b as *const _;
+
+            js! { (url, a as *const libc::c_void,
+                    rust_caller_string::<F> as *const libc::c_void),
+                br#"
+                $.ajax({url: UTF8ToString($0)}).done(function(data) {
+                    //var stack = Runtime.stackSave();
+                    Runtime.dynCall('vii', $2, [$1, allocate(intArrayFromString(data), 'i8', ALLOC_STACK)]);
+                    //Runtime.stackRestore(stack);
+                });
+            "#};
+            (&*self.refs).borrow_mut().push(b);
+        }
+
+    }
 }
 
 impl LocalStorageInterface {
