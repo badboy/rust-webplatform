@@ -431,7 +431,7 @@ extern fn rust_caller_string<F: FnMut(String)>(a: *const libc::c_void, dataptr: 
     v(data);
 }
 impl<'a> JQuery<'a> {
-    pub fn new<'a>() -> JQuery<'a> {
+    pub fn new() -> JQuery<'a> {
         JQuery {
             refs: Rc::new(RefCell::new(Vec::new())),
         }
