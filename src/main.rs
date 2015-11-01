@@ -26,6 +26,12 @@ fn main() {
             bodyref2.prop_set_str("bgColor", "blue");
         });
 
+        let jquery = JQuery::new();
+
+        jquery.ajax("/index.html", move |data| {
+            println!("ajax executed!");
+        });
+
         println!("This should be blue: {:?}", bodyref.prop_get_str("bgColor"));
         println!("Width?: {:?}", bodyref.prop_get_i32("clientWidth"));
 
