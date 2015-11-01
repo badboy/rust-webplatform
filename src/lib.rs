@@ -415,6 +415,7 @@ impl<'a> Document<'a> {
 
 pub struct LocalStorageInterface;
 pub struct SessionStorageInterface;
+pub struct DateInterface;
 
 pub struct LocalStorageIterator {
     index: i32,
@@ -455,6 +456,14 @@ impl<'a> JQuery<'a> {
             (&*self.refs).borrow_mut().push(b);
         }
 
+    }
+}
+
+impl DateInterface {
+    pub fn now(&self) -> i64 {
+        js! { br#"
+            return Date.now();
+        "# }
     }
 }
 
@@ -589,6 +598,7 @@ impl Iterator for LocalStorageIterator {
 pub const LocalStorage: LocalStorageInterface = LocalStorageInterface;
 #[allow(non_upper_case_globals)]
 pub const SessionStorage: SessionStorageInterface = SessionStorageInterface;
+pub const Date: DateInterface = DateInterface;
 
 pub fn init<'a>() -> Document<'a> {
     js! { br#"

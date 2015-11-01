@@ -43,6 +43,7 @@ fn main() {
 
         println!("This should be blue: {:?}", bodyref.prop_get_str("bgColor"));
         println!("Width?: {:?}", bodyref.prop_get_i32("clientWidth"));
+        println!("Timestamp: {:?}", webplatform::Date::now());
 
         webplatform::spin();
     }
