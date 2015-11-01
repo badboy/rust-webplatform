@@ -437,7 +437,7 @@ impl<'a> JQuery<'a> {
         }
     }
 
-    pub fn ajax<F: FnMut(String) + 'a>(&self, url: String, f: F) {
+    pub fn ajax<F: FnMut(String) + 'a>(&self, url: &str, f: F) {
         unsafe {
             let b = Box::new(f);
             let a = &*b as *const _;
@@ -445,7 +445,7 @@ impl<'a> JQuery<'a> {
             js! { (url, a as *const libc::c_void,
                     rust_caller_string::<F> as *const libc::c_void)
                 br#"
-                $.ajax({url: UTF8ToString($0)}).done(function(data) {
+                jQuery.ajax({url: UTF8ToString($0)}).done(function(data) {
                     //var stack = Runtime.stackSave();
                     Runtime.dynCall('vii', $2, [$1, allocate(intArrayFromString(data), 'i8', ALLOC_STACK)]);
                     //Runtime.stackRestore(stack);

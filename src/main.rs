@@ -26,10 +26,10 @@ fn main() {
             bodyref2.prop_set_str("bgColor", "blue");
         });
 
-        let jquery = JQuery::new();
+        let jquery = webplatform::JQuery::new();
 
-        jquery.ajax("/index.html", move |data| {
-            println!("ajax executed!");
+        jquery.ajax("/webplatform.html", move |data| {
+            println!("ajax executed!, data: {:?}", data);
         });
 
         println!("This should be blue: {:?}", bodyref.prop_get_str("bgColor"));
